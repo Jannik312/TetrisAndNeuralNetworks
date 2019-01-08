@@ -3,6 +3,19 @@ import matplotlib.pyplot as plt
 import random
 import pickle
 
+
+"""
+Guide:
+
+Run the function play() to play Tetris. Use '<-' and '->' to move the coming tile to the sides and the down arrow to 
+move the tile down. (I have not implemented that the tile moves down with ongoing time). Use the space bar to rotate the
+tile and press enter to move the tile as far down as possible (There is still a bug with that, but ¯\_(ツ)_/¯ ).
+
+If the game board is filled up the score appears on the board. Press any key to restart. The high score in the bottom 
+right corner gets updated if you break it. Have fun i guess.. ;)
+"""
+
+
 class Tetris:
 
     def __init__(self):
@@ -301,6 +314,7 @@ def play():
     global fig, ax, game
     fig, ax = plt.subplots()
     game = Tetris()
+    game.show()
 
     for i in range(0, 1):
         cid = fig.canvas.mpl_connect('key_press_event', onclick)
