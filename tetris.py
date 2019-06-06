@@ -1,8 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 import pickle
-
 
 """
 Guide:
@@ -36,13 +34,13 @@ class Tetris:
         return self.__str__()
 
     def shift_down(self, down=1, draw_on_board=False):
-        self.tile.center[0] = self.tile.center[0] + down  # move tile one block down
-        if not self.tile.is_on_board() or self.check_overlap():
-            # tile walked out of board --> Try to shift less down and write tile on board
-            self.tile.center[0] = self.tile.center[0] - down  # move tile back up
-            return self.shift_down(down=down-1, draw_on_board=True)
-        if draw_on_board:
-            self.draw_on_board()
+        for i in range(0, down):
+            self.tile.center[0] = self.tile.center[0] + 1  # move tile one block down
+            if not self.tile.is_on_board() or self.check_overlap():
+                # tile walked out of board --> Try to shift less down and write tile on board
+                self.tile.center[0] = self.tile.center[0] - 1  # move tile back up
+                self.draw_on_board()
+                break
         return self
 
     def check_overlap(self):
@@ -52,16 +50,16 @@ class Tetris:
                     return True
         return False
 
-    def shift_sideways(self, shift=0, draw_on_board = False):
-        self.tile.center[1] = self.tile.center[1] + shift  # move tile one block down
-        if not self.tile.is_on_board():
-            self.tile.center[1] = self.tile.center[1] - shift  # shift tile back
-            return self.shift_sideways(shift=shift-np.sign(shift))
-        if self.check_overlap():
-            self.tile.center[1] = self.tile.center[1] - shift  # shift tile back
-            return self.shift_sideways(shift=shift - np.sign(shift), draw_on_board=True)
-        if draw_on_board:
-            self.draw_on_board()
+    def shift_sideways(self, shift=0, draw_on_board=False):
+        for i in range(0, abs(shift)):
+            self.tile.center[1] = self.tile.center[1] + np.sign(shift)  # move tile one block in required direction
+            if not self.tile.is_on_board():
+                self.tile.center[1] = self.tile.center[1] - np.sign(shift)  # shift tile back
+                break
+            if self.check_overlap():
+                self.tile.center[1] = self.tile.center[1] - np.sign(shift)  # shift tile back
+                self.draw_on_board()
+                break
         return self
 
     def rotate(self):
@@ -74,7 +72,7 @@ class Tetris:
             return self
         return self
 
-    def show(self):
+    def show(self, playing=False):
 
         img = np.zeros((220, 200))
         # draw edge around board:
@@ -119,9 +117,15 @@ class Tetris:
             if self.score > self.high_score:
                 pickle.dump(self.score, open("Highscore.pickle", "wb"))
 
-        ax.clear()
-        ax.imshow(img, cmap='gray')
-        plt.show()
+        if not playing:
+            fig1, ax1 = plt.subplots()
+            ax1.clear()
+            ax1.imshow(img, cmap='gray')
+            plt.show()
+        else:
+            ax.clear()
+            ax.imshow(img, cmap='gray')
+            plt.show()
 
         if self.game_over:
             self.__init__()
@@ -191,23 +195,47 @@ class Tetris:
             score_mat = np.concatenate([score_mat, digits[:, 6*int(digit):6*(int(digit)+1)]], axis=1)
         return score_mat
 
+    def make_nn_move(self, nn_command):
+        """ This function makes a move on the tetris game based on the output of the neural network. you might have to
+        change this function depending on the network output structure.
+        :param self:
+        :param nn_command:
+        :return:
+        """
+        [move_l, move_r, stay, rotation] = nn_command
+        # firstly rotate:
+        if rotation >= 0.5:
+            self.rotate()
+        # secondly shift left or right
+        if move_l > move_r and move_l > stay:
+            self.shift_sideways(shift=-1)
+        elif move_r > move_l and move_r > stay:
+            self.shift_sideways(shift=1)
+        # thirdly move down:
+        self.shift_down(down=1)
+
 
 class Tile:
 
     def __init__(self, type=None):
 
         if type is None:
-            type = random.choice(['T', 'L1', 'L2', 'I', 'O', 'S1', 'S2'])
+            type = np.random.choice(['T', 'I', 'O', 'L1', 'L2', 'S1', 'S2'], p=[0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.1])
         elif type not in ['T', 'L1', 'L2', 'I', 'O', 'S1', 'S2']:
             raise ValueError(f'There is no tile of type {type}.')
 
         self.type = type
-        self.center = np.array([0, 0])
+        if type in ['L1', 'L2', 'S1', 'S2', 'T', 'I']:
+            self.center = np.array([0, 0])
+        if type in ['O']:
+            self.center = np.array([0.5, 0.5])
         self.orientation = 0
 
     def deploy(self):
-        self.center = np.array([0, 5])
+        self.center = self.center + [0, 5]
         self.orientation = np.random.randint(4)
+        if self.type == 'I' and self.orientation == 1:
+            self.center = self.center + [1, 0]
         return self
 
     def __str__(self):
@@ -217,63 +245,39 @@ class Tile:
         return f'"{self.type}", {self.center}, {self.orientation}'
 
     def rotate(self, roations=1):
-        self.orientation = (self.orientation + roations)%4
+        self.orientation = (self.orientation + roations) % 4
 
     def get_positions(self):
-
-        if self.type == 'L1':
-            positions = [(-1, 1), (-1, 0), (-1, -1), (0, -1)]
-        if self.type == 'L2':
-            positions = [(0, 1), (0, 0), (0, -1), (-1, -1)]
-        if self.type == 'S1':
-            positions = [(-1, 0), (-1, -1), (0, -1), (0, -2)]
-        if self.type == 'S2':
-            positions = [(0, 0), (0, -1), (-1, -1), (-1, -2)]
-        if self.type == 'O':
-            positions = [(-1, 0), (-1, -1), (0, -1), (0, 0)]
-        if self.type == 'T':
-            positions = [(-1, 0), (-1, -1), (0, -1), (-1, -2)]
-        if self.type == 'I':
-            positions = [(0, 1), (0, 0), (0, -1), (0, -2)]
-
-        positions = self.rotate_positions(positions, self.orientation)
-        positions = self.shift_raw_positions(positions, self.center)
-
-        return positions
-
-    def rotate_positions(self, positions, num_of_rot):
         r = np.array([[0, -1], [1, 0]])  # 90 deg rotation matrix (counter clockwise)
-        for i in range(0, num_of_rot):
-            for pos in range(0, len(positions)):
-                positions[pos] = (r.dot(positions[pos] + np.array([0.5, 0.5])) - np.array([0.5, 0.5])).astype(int)
-        return positions
+        if self.type == 'L1':
+            positions = np.array([(0, 1), (0, 0), (0, -1), (1, -1)])
+        if self.type == 'L2':
+            positions = np.array([(0, 1), (0, 0), (0, -1), (-1, -1)])
+        if self.type == 'S1':
+            positions = np.array([(0, -1), (0, 0), (1, 0), (1, 1)])
+        if self.type == 'S2':
+            positions = np.array([(0, -1), (0, 0), (-1, 0), (-1, 1)])
+        if self.type == 'O':
+            positions = np.array([(-0.5, -0.5), (-0.5, 0.5), (0.5, -0.5), (0.5, 0.5)])
+        if self.type == 'T':
+            positions = np.array([(-1, 0), (0, 0), (1, 0), (0, -1)])
+        if self.type == 'I':
+            positions = np.array([(0, 1), (0, 0), (0, -1), (0, -2)])
 
-    def shift_raw_positions(self, positions, center):
-        for pos in range(0, len(positions)):
-            positions[pos] = positions[pos] + center
-        return positions
+        # rotate:
+        for i in range(0, self.orientation):
+            positions = positions.dot(r)
+
+        # move to center
+        return (positions + self.center).astype(int)
 
     def show(self, suppress=False):
         positions = self.get_positions()
         # assert that min of x and y coordinate are 0:
-        min_x = np.inf
-        min_y = np.inf
-        max_x = - np.inf
-        max_y = - np.inf
-        for pos in positions:
-            if pos[0] < min_x:
-                min_x = pos[0]
-            if pos[1] < min_y:
-                min_y = pos[1]
-            if pos[0] > max_x:
-                max_x = pos[0]
-            if pos[1] > max_y:
-                max_y = pos[1]
-        for pos in positions:
-            pos[0] = pos[0] - min_x
-            pos[1] = pos[1] - min_y
-        max_x = max_x - min_x
-        max_y = max_y - min_y
+        positions[:, 0] = positions[:, 0] - positions[:, 0].min()
+        positions[:, 1] = positions[:, 1] - positions[:, 1].min()
+        max_x = positions[:, 0].max()
+        max_y = positions[:, 1].max()
 
         # create img, one pixel bigger as tile in each direction
         img = np.zeros((max_x+3, max_y+3))
@@ -288,12 +292,12 @@ class Tile:
 
     def is_on_board(self, board_x=20, board_y=10):
         positions = self.get_positions()
-        for pos in positions:
-            if pos[1] < 0 or pos[1] >= board_y:
-                return False
-            if pos[0] >= board_x:
-                return False
-        return True
+        if positions[:, 0].min() < 0 or positions[:, 0].max() >= board_x:
+            return False
+        elif positions[:, 1].min() < 0 or positions[:, 1].max() >= board_y:
+            return False
+        else:
+            return True
 
 
 def onclick(event):
@@ -308,19 +312,37 @@ def onclick(event):
         game.rotate()
     if event.key is 'enter':
         game.shift_down(down=20)
-    game.show()
+    game.show(playing=True)
+
 
 def play():
     global fig, ax, game
     fig, ax = plt.subplots()
     game = Tetris()
-    game.show()
+    game.show(playing=True)
 
     for i in range(0, 1):
         cid = fig.canvas.mpl_connect('key_press_event', onclick)
 
 
+def watch_NN_play_tetris(neural_network=None):
+    if neural_network is None:
+        neural_network = pickle.load(open("Best_NN.pickle", "rb"))
+    global fig, ax, game, nn
+    fig, ax = plt.subplots()
+    game = Tetris()
+    game.show(playing=True)
+    nn = neural_network
 
+    for i in range(0, 1):
+        cid = fig.canvas.mpl_connect('key_press_event', onclick_nn)
+
+
+def onclick_nn(event):
+    input_vector = game.board.flatten()
+    nn_command = nn.predict(input_vector)
+    game.make_nn_move(nn_command)
+    game.show(playing=True)
 
 
 

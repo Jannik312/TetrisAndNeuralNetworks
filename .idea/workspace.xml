@@ -2,8 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c8d813fd-6ef2-416d-a4ba-5c0224ad3edf" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/JanniksNN.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Highscore.pickle" beforeDir="false" afterPath="$PROJECT_DIR$/Highscore.pickle" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JanniksNN.py" beforeDir="false" afterPath="$PROJECT_DIR$/JanniksNN.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tetris.py" beforeDir="false" afterPath="$PROJECT_DIR$/tetris.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -15,37 +17,42 @@
     <session id="1658962815">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="3" />
+          <entry key="project.closed" value="5" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="1" />
+          <entry key="project.open.time.10" value="1" />
+          <entry key="project.open.time.2" value="1" />
+          <entry key="project.open.time.5" value="1" />
           <entry key="project.open.time.8" value="1" />
           <entry key="project.open.time.9" value="1" />
-          <entry key="project.opened" value="4" />
+          <entry key="project.opened" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="gitignore" value="1" />
+          <entry key="png" value="4" />
           <entry key="py" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
+          <entry key="Image" value="4" />
           <entry key="PLAIN_TEXT" value="1" />
           <entry key="Python" value="2" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="Python Console" value="3602" />
+          <entry key="Python Console" value="6568" />
           <entry key="gitignore" value="8" />
-          <entry key="py" value="13507" />
+          <entry key="py" value="23255" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="8" />
-          <entry key="Python" value="17109" />
+          <entry key="Python" value="29823" />
         </counts>
       </usages-collector>
     </session>
@@ -55,22 +62,13 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/tetris.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-4546">
-              <caret line="14" column="64" selection-start-line="14" selection-start-column="64" selection-end-line="14" selection-end-column="64" />
+            <state relative-caret-position="199">
+              <caret line="222" column="75" selection-start-line="222" selection-start-column="36" selection-end-line="222" selection-end-column="75" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1546895182469" expanded="true" signature="1832:1837" ph="..." />
-                <marker date="1546895182469" expanded="true" signature="2708:2978" ph="..." />
+                <marker date="1559815374330" expanded="true" signature="1792:1797" ph="..." />
+                <marker date="1559815374330" expanded="true" signature="2635:2905" ph="..." />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="474">
-              <caret line="105" column="6" selection-start-line="105" selection-start-column="6" selection-end-line="105" selection-end-column="6" />
             </state>
           </provider>
         </entry>
@@ -78,16 +76,19 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/JanniksNN.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="417">
-              <caret line="156" column="12" selection-start-line="156" selection-start-column="12" selection-end-line="156" selection-end-column="12" />
+            <state relative-caret-position="335">
+              <caret line="400" lean-forward="true" selection-start-line="400" selection-end-line="400" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1546979582655" expanded="true" signature="68:69" ph="..." />
-                <marker date="1546979582655" expanded="true" signature="68:74" ph="..." />
-                <marker date="1546979582655" expanded="true" signature="569:642" ph="..." />
-                <marker date="1546979582655" expanded="true" signature="1054:1063" ph="..." />
-                <marker date="1546979582655" expanded="true" signature="3635:3949" ph="..." />
-                <marker date="1546979582655" expanded="true" signature="3969:3978" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="165:166" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="165:171" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="694:787" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="1199:1208" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="3780:4094" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="4114:4123" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="9453:15357" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="15504:15708" ph="..." />
+                <marker date="1559821245921" expanded="true" signature="18301:18302" ph="..." />
               </folding>
             </state>
           </provider>
@@ -105,6 +106,11 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>orie</find>
+      <find>neurona</find>
+      <find>neuronal_network</find>
+      <find>relu</find>
+      <find>flatte</find>
+      <find>plt</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -130,7 +136,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -142,6 +147,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -190,7 +196,7 @@
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.329718" />
       <window_info anchor="bottom" id="Event Log" order="9" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.329718" />
+      <window_info active="true" anchor="bottom" id="Python Console" order="10" visible="true" weight="0.4219089" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
@@ -200,37 +206,46 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/tetris.py">
+    <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-4546">
-          <caret line="14" column="64" selection-start-line="14" selection-start-column="64" selection-end-line="14" selection-end-column="64" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-            <marker date="1546895182469" expanded="true" signature="1832:1837" ph="..." />
-            <marker date="1546895182469" expanded="true" signature="2708:2978" ph="..." />
-          </folding>
+        <state relative-caret-position="1785">
+          <caret line="105" column="6" selection-start-line="105" selection-start-column="6" selection-end-line="105" selection-end-column="6" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.gitignore">
+    <entry file="file://$PROJECT_DIR$/(20,10), noskip, 200gen.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/(100,100), noskip, 500gen.png">
+      <provider selected="true" editor-type-id="images" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/tetris.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="474">
-          <caret line="105" column="6" selection-start-line="105" selection-start-column="6" selection-end-line="105" selection-end-column="6" />
+        <state relative-caret-position="199">
+          <caret line="222" column="75" selection-start-line="222" selection-start-column="36" selection-end-line="222" selection-end-column="75" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1559815374330" expanded="true" signature="1792:1797" ph="..." />
+            <marker date="1559815374330" expanded="true" signature="2635:2905" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/JanniksNN.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="417">
-          <caret line="156" column="12" selection-start-line="156" selection-start-column="12" selection-end-line="156" selection-end-column="12" />
+        <state relative-caret-position="335">
+          <caret line="400" lean-forward="true" selection-start-line="400" selection-end-line="400" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1546979582655" expanded="true" signature="68:69" ph="..." />
-            <marker date="1546979582655" expanded="true" signature="68:74" ph="..." />
-            <marker date="1546979582655" expanded="true" signature="569:642" ph="..." />
-            <marker date="1546979582655" expanded="true" signature="1054:1063" ph="..." />
-            <marker date="1546979582655" expanded="true" signature="3635:3949" ph="..." />
-            <marker date="1546979582655" expanded="true" signature="3969:3978" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="165:166" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="165:171" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="694:787" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="1199:1208" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="3780:4094" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="4114:4123" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="9453:15357" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="15504:15708" ph="..." />
+            <marker date="1559821245921" expanded="true" signature="18301:18302" ph="..." />
           </folding>
         </state>
       </provider>

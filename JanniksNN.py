@@ -1,5 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
+from tetris import Tetris
+from abc import ABC, abstractmethod
+import pickle
+
 
 class JanniksNN:
 
@@ -17,10 +22,12 @@ class JanniksNN:
         self.neurons = []
         self.weights = []
         self.neuron_fct = neuron_fct
+        self.fitness = None
 
     def initialize(self):
         self.initialize_weights()
         self.initialize_biases()
+        return self
 
     def initialize_weights(self):
         """
@@ -196,10 +203,195 @@ class JanniksNN:
         if dna.size > 0:
             raise ValueError('DNA was to long for given net structure')
 
+        return self
         # TODO: This is a little inconvinient because I have to consider the three spacial cases of weights between
         # input and hidden, hidden and hidden, and hidden and output. To solve this I could encode the size of input and
         # output in the self.layer tuple. If I do that I have to change other functions as well (at least the
         # initialization function) so I'll keep it how it is...
+
+
+class Population(ABC):
+
+    def __init__(self, size=50):
+        self.individuals = pd.DataFrame(index=range(0, size), columns=['Individual', 'Fitness'])
+        self.generation = 0
+        self.size = size
+        self.fitness_history = []
+
+    def generate_first_generation(self, input_size, hidden_layers, output_size, neuron_fct):
+        """
+        This function creates self.size many JanniksNNs with required structure and initializes them randomly
+        :param input_size:
+        :param hidden_layers:
+        :param output_size:
+        :param neuron_fct:
+        :return:
+        """
+        for i in range(0, self.size):
+            self.individuals.loc[i, 'Individual'] = \
+                JanniksNN(input_size, hidden_layers, output_size, neuron_fct).initialize()
+
+        return self
+
+    def __repr__(self):
+        return self.individuals.__repr__()
+
+    @abstractmethod
+    def fitness_function(self, neural_network):
+        pass
+
+    def evaluate_all_fitness(self, skip=True):
+        """
+        This function calculates the fitness of all individuals. If skip==True the function will skip the calculation
+        for individuals which already have a fitness value
+        :param skip:
+        :return:
+        """
+
+        for idx in range(0, self.size):
+            if not skip or self.individuals['Fitness'][idx] is np.nan:
+                self.individuals['Fitness'][idx] = self.fitness_function(self.individuals['Individual'][idx])
+
+    def next_generation(self, survivors=5, chance_of_mutation=0.01):
+        """
+        This function generates the next generation of NNs. The survivors-fittest NNs will stay alive. Further
+        self.size - survivors new individuals will be generated. This is done by crossing the weights and biases of two
+        individuals. The probability that one individual is selected for reproduction is proportional to its fitness
+        rank (Motivated by this paper https://www.researchgate.net/publication/259461147_Selection_Methods_for_Genetic_A
+        lgorithms). Which of the two individuals hands down a specific weight or bias is determined by a coin toss.
+        After the reproduction the new individual is mutated.
+
+        :param survivors: int determining the number of survivors
+        :param chance_of_mutation: chance that a weight or bias from new individual gets replaced by new random value
+        :return:
+        """
+
+        self.sort_by_fitness()
+        # add fitness of current generation to self.fitness_history:
+        self.fitness_history.append(self.individuals['Fitness'])
+        # assign fittest individuals to next generation
+        new_individuals = self.individuals.iloc[0:survivors, :]
+        # calculate probability of individual getting selected for reproduction:
+        p = np.array(self.individuals.index)
+        p = self.size - p
+        p = p/p.sum()
+        for i in range(survivors, self.size):
+            [first_parent, second_parent] = np.random.choice(self.individuals['Individual'], p=p, size=2)
+            first_parent = first_parent.zip()
+            second_parent = second_parent.zip()
+            # set new individual as first parent and change weights and biases to values from second parent randomly
+            new_individual = first_parent
+            choice = np.random.choice([True, False], size=len(first_parent))
+            new_individual[choice] = second_parent[choice]
+            # mutate:
+            mutation_array = JanniksNN(input_size=self.individuals['Individual'][0].input_size,
+                                       hidden_layers=self.individuals['Individual'][0].layers,
+                                       output_size=self.individuals['Individual'][0].output_size).initialize().zip()
+            choice = np.random.choice([True, False], size=len(first_parent),
+                                      p=[chance_of_mutation, 1-chance_of_mutation])
+            new_individual[choice] = mutation_array[choice]
+            new_individual = JanniksNN(input_size=self.individuals['Individual'][0].input_size,
+                                       hidden_layers=self.individuals['Individual'][0].layers,
+                                       output_size=self.individuals['Individual'][0].output_size).unzip(new_individual)
+            new_individuals = new_individuals.append(pd.DataFrame(index=[i], columns=['Individual', 'Fitness'],
+                                                                  data=[[new_individual, np.nan]]))
+
+        self.individuals = new_individuals
+        self.generation += 1
+
+    def sort_by_fitness(self):
+        self.individuals = self.individuals.sort_values(by='Fitness', ascending=False)
+        self.individuals.index = range(0, self.size)
+        return self
+
+    def visualize_history(self):
+        max_fitness_of_each_gen = np.array([])
+        mean_fitness_of_each_gen = np.array([])
+        min_fitness_of_each_gen = np.array([])
+        std_of_fitness_of_each_gen = np.array([])
+        for fitness_of_gen in self.fitness_history:
+            max_fitness_of_each_gen = np.append(max_fitness_of_each_gen, max(fitness_of_gen))
+            mean_fitness_of_each_gen = np.append(mean_fitness_of_each_gen, np.array(fitness_of_gen).mean())
+            min_fitness_of_each_gen = np.append(min_fitness_of_each_gen, min(fitness_of_gen))
+            std_of_fitness_of_each_gen = np.append(std_of_fitness_of_each_gen, np.array(fitness_of_gen).std())
+
+        fig, ax = plt.subplots()
+        x = range(0, self.generation)
+        shades = 50
+        for i in np.linspace(0, 2, num=shades):
+            ax.fill_between(x, mean_fitness_of_each_gen + i*std_of_fitness_of_each_gen,
+                            mean_fitness_of_each_gen - i*std_of_fitness_of_each_gen,
+                            alpha=1/(2*shades), facecolor='blue')
+        ax.plot(x, max_fitness_of_each_gen, color='red')
+        ax.plot(x, min_fitness_of_each_gen, color='green')
+
+
+class TetrisPopulation(Population):
+
+    def generate_first_generation(self, input_size=23, hidden_layers=(20,), output_size=4, neuron_fct='relu'):
+        return super().generate_first_generation(input_size=input_size, hidden_layers=hidden_layers,
+                                                 output_size=output_size, neuron_fct=neuron_fct)
+
+    def fitness_function(self, neural_network, number_of_games=5):
+        """
+        This function takes a neuronal network and lets it play tetris to calculate a score. This is done multiple times
+        until the average score is significant for the fitness of the nn.
+        :param neural_network:
+        :param number_of_games:
+        :return:
+        """
+
+        scores = []
+        for i in range(0, number_of_games):
+            # start new game:
+            game = Tetris()
+            # play until game over
+            while not game.game_over:
+                input_vector = self.generate_input_vector(game)
+                nn_command = neural_network.predict(input_vector)
+                game.make_nn_move(nn_command)
+
+            scores.append(game.score)
+
+        return np.array(scores).mean()
+
+    @staticmethod
+    def generate_input_vector(game):
+        # this vector specifies how high each column is filled in %:
+        board_filling = (20 - np.argmax(game.board, axis=0))/20
+        # this vector specifies which type the current tile has using 'one hot encoding'
+        tile_type = (np.array(['T', 'I', 'O', 'L1', 'L2', 'S1', 'S2']) == game.tile.type) * 1.0
+        # this vector specifies the orientation of the tile using 'one hot encoding'
+        tile_rotation = (np.array([0, 1, 2, 3]) == game.tile.orientation) * 1.0
+        # this vector specifies the center of tile by relative position in x and y direction
+        tile_positon = game.tile.center / np.array([20, 10])
+        # together all those vectors create the vector that will be the input of the neural net.
+        input_vector = np.concatenate([board_filling, tile_type, tile_rotation, tile_positon])
+        return input_vector
+
+
+def train_tetris_NN(pop=None, max_iter=None):
+
+    if pop is None:
+        pop = TetrisPopulation(size=100).generate_first_generation(hidden_layers=(100, 100))
+
+    i = 1
+    while True:
+        if max_iter is not None and i > max_iter:
+            break
+        pop.evaluate_all_fitness(skip=False)
+        pop.next_generation(chance_of_mutation=0.05, survivors=5)
+        best_nn = pickle.load(open("Best_NN.pickle", "rb"))
+        print(f'Best Fitness of generateion {pop.generation}: {pop.individuals["Fitness"][0]}')
+        if best_nn.fitness < pop.individuals['Fitness'][0]:
+            new_best_nn = pop.individuals['Individual'][0]
+            new_best_nn.fitness = pop.individuals['Fitness'][0]
+            pickle.dump(new_best_nn, open("Best_NN.pickle", "wb"))
+        print(f'Best Fitness overall: {best_nn.fitness}')
+        i += 1
+
+    return pop
+
 
 
 
